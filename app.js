@@ -121,10 +121,12 @@ io.of('/game').on('connection', function(socket) {
 
     socket.on('disconnect', function() {
         rooms[socket.room].played = {};
+        rooms[socket.room].moves = 0;
     });
 
     socket.on('reset', function() {
         rooms[socket.room].played = {};
+        rooms[socket.room].moves = 0;
         io.of('/game').to(socket.room).emit('reset');
     })
 });
