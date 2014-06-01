@@ -14,12 +14,13 @@ body {
 	margin-right: auto;
 	position: relative;
 	margin-top: 10px;
+	margin-bottom: 10px;
 }
 
 .square {
 	position: absolute;
-	width: 110px;
-	height: 110px;
+	width: 115px;
+	height: 115px;
 	border: 5px solid black;
 	border-collapse: collapse;
 	font-size: 40pt;

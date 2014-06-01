@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	"use strict";
 	$("#reset").disabled = true;
-	var socket = io.connect('http://localhost:3000/socket');
+	var socket = io.connect('http://localhost:3000/game');
 	var pixels = 120;
 	(function () {
 		for(var row = 0; row < 3; row++) {
@@ -22,6 +22,7 @@ $(document).ready(function() {
 		if(!($(this).prop("disabled")) && !($("#game").prop("played"))) {
 			var row = parseInt($(this).css("top")) / pixels;
 			var col = parseInt($(this).css("left")) / pixels;
+			console.log(row + " " + col);
 			socket.emit("clicked", {
 				"row": row,
 				"col": col
@@ -41,7 +42,7 @@ $(document).ready(function() {
 	socket.on("reset", function() {
 		$(".square").text("").prop("disabled", false);
 		$("#reset").attr("disabled", true);
-		$("#result").text("");
+		$("#message").text("");
 	});
 
 	socket.on("played", function(position) {
@@ -50,13 +51,11 @@ $(document).ready(function() {
 		.prop("disabled", true);
 		$("#game").prop("played", true);
 		if(position.over) {
-			var message = $("<p>", {id: "result"});
-			message.text("Congratulations! You win.");
-			message.css({
+			$("#message").text("Congratulations! You win.")
+			.css({
 				"font-size": "30pt",
 				"color": "green"
 			});
-			$("#message").append(message);
 			$("#reset").attr("disabled", false);
 		}
 	});
@@ -67,13 +66,11 @@ $(document).ready(function() {
 		.prop("disabled", true);
 		$("#game").prop("played", false);
 		if(position.over) {
-			var message = $("<p>", {id: "result"});
-			message.text("Sorry! You lost.");
-			message.css({
+			$("#message").text("Sorry! You lose.")
+			.css({
 				"font-size": "30pt",
 				"color": "red"
 			});
-			$("#message").append(message);
 			$("#reset").attr("disabled", false);
 		}
 	});

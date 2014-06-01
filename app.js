@@ -14,7 +14,7 @@ var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 
 var rooms = {};
-io.of('/socket').on('connection', function(socket) {
+io.of('/game').on('connection', function(socket) {
     socket.on('load', function(id) {
         if(!rooms[id]) {
             rooms[id] = {
@@ -111,14 +111,12 @@ io.of('/socket').on('connection', function(socket) {
     });
 
     socket.on('disconnect', function() {
-        var played = rooms[socket.room].played;
-        played = {};
+        rooms[socket.room].played = {};
     });
 
     socket.on('reset', function() {
-        var played = rooms[socket.room].played;
-        played = {};
-        io.of('/socket').to(socket.room).emit('reset');
+        rooms[socket.room].played = {};
+        io.of('/game').to(socket.room).emit('reset');
     })
 });
 
