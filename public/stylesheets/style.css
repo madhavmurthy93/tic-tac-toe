@@ -1,8 +1,27 @@
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  padding: 20px;
+  width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  font: 12pt "Comic Sans", "Comic Sans MS", cursive;
+  text-align: center;
 }
 
-a {
-  color: #00B7FF;
+#game {
+	width: 360px;
+	height: 360px;
+	margin-left: auto;
+	margin-right: auto;
+	position: relative;
+	margin-top: 10px;
+}
+
+.square {
+	position: absolute;
+	width: 110px;
+	height: 110px;
+	border: 5px solid black;
+	border-collapse: collapse;
+	font-size: 40pt;
+	vertical-align: middle;
 }

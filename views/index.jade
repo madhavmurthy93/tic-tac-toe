@@ -1,5 +1,17 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+	h1 Tic Tac Toe
+	p 
+		| Tic-tac-toe is a game for two players who take turns marking the spaces in a 3x3 grid. The
+		| player who succeeds in placing three respective marks in a horizontal, vertical or
+		| diagonal row wins the game.
+	div#game
+
+	div#controls
+		button#reset(disabled) Reset
+	div#message
+
+	script(src='/socket.io/socket.io.js').
+	script(src='/javascripts/tic.js').  
+
