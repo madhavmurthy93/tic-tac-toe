@@ -57,6 +57,13 @@ $(document).ready(function() {
 				"color": "green"
 			});
 			$("#reset").attr("disabled", false);
+		} else if(position.draw) {
+			$("#message").text("Game ended in a draw.")
+			.css({
+				"font-size": "30pt",
+				"color": "blue"
+			});
+			$("#reset").attr("disabled", false);
 		}
 	});
 
@@ -70,6 +77,13 @@ $(document).ready(function() {
 			.css({
 				"font-size": "30pt",
 				"color": "red"
+			});
+			$("#reset").attr("disabled", false);
+		} else if(position.draw) {
+			$("#message").text("Game ended in a draw.")
+			.css({
+				"font-size": "30pt",
+				"color": "blue"
 			});
 			$("#reset").attr("disabled", false);
 		}

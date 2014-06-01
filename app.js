@@ -19,7 +19,8 @@ io.of('/game').on('connection', function(socket) {
         if(!rooms[id]) {
             rooms[id] = {
                 'count': 0,
-                'played': {}
+                'played': {},
+                'moves': 0
             }
         }
         rooms[id].count += 1;
@@ -46,6 +47,7 @@ io.of('/game').on('connection', function(socket) {
         'symbol': socket.symbol,
         'color': socket.color
         };
+        rooms[socket.room].moves++;
         var col_win = true;
         var row_win = true;
         var diag_win = true;
@@ -92,6 +94,11 @@ io.of('/game').on('connection', function(socket) {
             antidiag_win = false;
         }
 
+        var draw = false;
+        if(rooms[socket.room].moves == 9) {
+            draw = true;
+        }
+
         var over = (row_win || col_win || diag_win || antidiag_win);
 
         socket.broadcast.to(socket.room).emit('clicked', {
@@ -99,14 +106,16 @@ io.of('/game').on('connection', function(socket) {
             'col': position.col,
             'symbol': socket.symbol,
             'color': socket.color,
-            'over': over
+            'over': over,
+            'draw': draw
         });
         socket.emit('played', {
             'row': position.row,
             'col': position.col,
             'symbol': socket.symbol,
             'color': socket.color,
-            'over': over
+            'over': over,
+            'draw': draw
         });
     });
 
