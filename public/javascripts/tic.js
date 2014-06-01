@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	"use strict";
 	$("#reset").disabled = true;
-	var socket = io.connect('http://localhost:3000');
+	var socket = io.connect('http://localhost:3000/socket');
 	var pixels = 120;
 	(function () {
 		for(var row = 0; row < 3; row++) {
@@ -31,6 +31,11 @@ $(document).ready(function() {
 
 	$("#reset").click(function() {
 		socket.emit("reset");
+	});
+
+	socket.on("connect", function() {
+		var id = Number(window.location.pathname.match(/\/(\d+)$/)[1]);
+		socket.emit("load", id);
 	});
 
 	socket.on("reset", function() {

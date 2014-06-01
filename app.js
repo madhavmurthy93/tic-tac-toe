@@ -13,26 +13,38 @@ var app = express();
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 
-var count = 0;
-var played = {};
-io.sockets.on('connection', function(socket) {
-    count++;
-    var symbol = '';
-    var color = '';
-    if(count % 2 == 1) {
-        symbol = 'o';
-        color = 'blue';
-    } else {
-        symbol = 'x';
-        color = 'red';
-    }
+var rooms = {};
+io.of('/socket').on('connection', function(socket) {
+    socket.on('load', function(id) {
+        if(!rooms[id]) {
+            rooms[id] = {
+                'count': 0,
+                'played': {}
+            }
+        }
+        rooms[id].count += 1;
+        var symbol = '';
+        var color = '';
+        if(rooms[id].count % 2 == 1) {
+            symbol = 'o';
+            color = 'blue';
+        } else {
+            symbol = 'x';
+            color = 'red';
+        }
+        socket.room = id;
+        socket.symbol = symbol;
+        socket.color = color;
+        socket.join(id);
+    });
 
     socket.on('clicked', function(position) {
+        var played = rooms[socket.room].played;
         played[position.row + "_" + position.col] =  
         {'row': position.row,
         'col': position.col,
-        'symbol': symbol,
-        'color': color
+        'symbol': socket.symbol,
+        'color': socket.color
         };
         var col_win = true;
         var row_win = true;
@@ -82,29 +94,31 @@ io.sockets.on('connection', function(socket) {
 
         var over = (row_win || col_win || diag_win || antidiag_win);
 
-        socket.broadcast.emit('clicked', {
+        socket.broadcast.to(socket.room).emit('clicked', {
             'row': position.row,
             'col': position.col,
-            'symbol': symbol,
-            'color': color,
+            'symbol': socket.symbol,
+            'color': socket.color,
             'over': over
         });
         socket.emit('played', {
             'row': position.row,
             'col': position.col,
-            'symbol': symbol,
-            'color': color,
+            'symbol': socket.symbol,
+            'color': socket.color,
             'over': over
         });
     });
 
     socket.on('disconnect', function() {
+        var played = rooms[socket.room].played;
         played = {};
     });
 
     socket.on('reset', function() {
+        var played = rooms[socket.room].played;
         played = {};
-        io.sockets.emit('reset');
+        io.of('/socket').to(socket.room).emit('reset');
     })
 });
 
@@ -120,6 +134,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', routes.index);
+app.get('/:id', routes.game);
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
