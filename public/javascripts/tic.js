@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	"use strict";
 	$("#reset").disabled = true;
-	var socket = io.connect('http://localhost:3000/game');
+	var socket = io.connect('http://localhost:3000/');
 	var pixels = 120;
 	(function () {
 		for(var row = 0; row < 3; row++) {
@@ -22,7 +22,6 @@ $(document).ready(function() {
 		if(!($(this).prop("disabled")) && !($("#game").prop("played"))) {
 			var row = parseInt($(this).css("top")) / pixels;
 			var col = parseInt($(this).css("left")) / pixels;
-			console.log(row + " " + col);
 			socket.emit("clicked", {
 				"row": row,
 				"col": col
@@ -87,5 +86,9 @@ $(document).ready(function() {
 			});
 			$("#reset").attr("disabled", false);
 		}
+	});
+
+	socket.on("full", function(id) {
+		window.location.href = "/" + id;
 	});
 });

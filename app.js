@@ -71,7 +71,7 @@ function game_draw(moves) {
 }
 
 var rooms = {};
-io.of('/game').on('connection', function(socket) {
+io.sockets.on('connection', function(socket) {
     socket.on('load', function(id) {
         if(!rooms[id]) {
             rooms[id] = {
@@ -83,17 +83,22 @@ io.of('/game').on('connection', function(socket) {
         rooms[id].count += 1;
         var symbol = '';
         var color = '';
-        if(rooms[id].count % 2 == 1) {
-            symbol = 'o';
-            color = '#5E84CF';
+        if(rooms[id].count < 3) {
+            if(rooms[id].count % 2 == 1) {
+                symbol = 'o';
+                color = '#5E84CF';
+            } else {
+                symbol = 'x';
+                color = '#FF6262';
+            }
+            socket.room = id;
+            socket.symbol = symbol;
+            socket.color = color;
+            socket.join(id);
         } else {
-            symbol = 'x';
-            color = '#FF6262';
+            var id = Math.round(Math.random() * 100000);
+            socket.emit('full', id);
         }
-        socket.room = id;
-        socket.symbol = symbol;
-        socket.color = color;
-        socket.join(id);
     });
 
     socket.on('clicked', function(position) {
@@ -125,16 +130,17 @@ io.of('/game').on('connection', function(socket) {
         });
     });
 
-    socket.on('disconnect', function() {
-        rooms[socket.room].played = {};
-        rooms[socket.room].moves = 0;
-    });
-
     socket.on('reset', function() {
         rooms[socket.room].played = {};
         rooms[socket.room].moves = 0;
-        io.of('/game').to(socket.room).emit('reset');
-    })
+        io.sockets.to(socket.room).emit('reset');
+    });
+
+    socket.on('disconnect', function() {
+        rooms[socket.room].played = {};
+        rooms[socket.room].moves = 0;
+        rooms[socket.room].count -= 1;
+    });
 });
 
 app.set('port', process.env.PORT || 3000);
