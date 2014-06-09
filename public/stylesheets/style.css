@@ -3,10 +3,17 @@ body {
   width: 600px;
   margin-left: auto;
   margin-right: auto;
-  font: 12pt "Comic Sans", "Comic Sans MS", cursive;
+  font-size: 12pt;
+  font-family: "Source Sans Pro", Helvetica, sans-serif;
   text-align: center;
+  color: #1A334C;
 }
 
+button {
+	font-size: 12pt;
+	font-family: "Source Sans Pro", Helvetica, sans-serif;
+	color: #1A334C;
+}
 #game {
 	width: 360px;
 	height: 360px;
@@ -21,8 +28,8 @@ body {
 	position: absolute;
 	width: 115px;
 	height: 115px;
-	border: 5px solid black;
+	border: 5px solid #1A334C;
 	border-collapse: collapse;
-	font-size: 40pt;
+	font-size: 50pt;
 	vertical-align: middle;
 }

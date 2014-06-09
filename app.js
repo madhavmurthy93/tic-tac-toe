@@ -85,10 +85,10 @@ io.of('/game').on('connection', function(socket) {
         var color = '';
         if(rooms[id].count % 2 == 1) {
             symbol = 'o';
-            color = 'blue';
+            color = '#5E84CF';
         } else {
             symbol = 'x';
-            color = 'red';
+            color = '#FF6262';
         }
         socket.room = id;
         socket.symbol = symbol;

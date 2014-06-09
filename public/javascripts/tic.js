@@ -54,14 +54,14 @@ $(document).ready(function() {
 			$("#message").text("Congratulations! You win.")
 			.css({
 				"font-size": "30pt",
-				"color": "green"
+				"color": "#45C585"
 			});
 			$("#reset").attr("disabled", false);
 		} else if(position.draw) {
 			$("#message").text("Game ended in a draw.")
 			.css({
 				"font-size": "30pt",
-				"color": "blue"
+				"color": "#5E84CF"
 			});
 			$("#reset").attr("disabled", false);
 		}
@@ -76,14 +76,14 @@ $(document).ready(function() {
 			$("#message").text("Sorry! You lose.")
 			.css({
 				"font-size": "30pt",
-				"color": "red"
+				"color": "#FF6262"
 			});
 			$("#reset").attr("disabled", false);
 		} else if(position.draw) {
 			$("#message").text("Game ended in a draw.")
 			.css({
 				"font-size": "30pt",
-				"color": "blue"
+				"color": "#5E84CF"
 			});
 			$("#reset").attr("disabled", false);
 		}
