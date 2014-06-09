@@ -140,6 +140,7 @@ io.sockets.on('connection', function(socket) {
         rooms[socket.room].played = {};
         rooms[socket.room].moves = 0;
         rooms[socket.room].count -= 1;
+        io.sockets.to(socket.room).emit('reset');
     });
 });
 
