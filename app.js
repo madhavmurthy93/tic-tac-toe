@@ -13,6 +13,63 @@ var app = express();
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 
+function game_over(position, played) {
+    var col_win = true;
+    var row_win = true;
+    var diag_win = true;
+    var antidiag_win = true;
+    var square = position.row + "_" + position.col;
+    var square_symbol = played[square].symbol;
+    for(var col = 0; col < 3; col++) {
+        if(played[position.row + "_" + col]) {
+            if(played[position.row + "_" + col].symbol != square_symbol) {
+                row_win = false;
+            }
+        } else {
+            row_win = false;
+        }
+    }
+
+    for(var row = 0; row < 3; row++) {
+        if(played[row + "_" + position.col]) {
+            if(played[row + "_" + position.col].symbol != square_symbol) {
+                col_win = false;
+            }
+        } else {
+            col_win = false;
+        }
+    }
+
+    if(played[0 + "_" + 0] && played[1 + "_" + 1] && played[2 + "_" + 2]) {
+        if(played[0 + "_" + 0].symbol != square_symbol ||
+           played[1 + "_" + 1].symbol != square_symbol ||
+           played[2 + "_" + 2].symbol != square_symbol) {
+            diag_win = false;
+        }
+    } else {
+        diag_win = false;
+    }
+
+    if(played[0 + "_" + 2] && played[1 + "_" + 1] && played[2 + "_" + 0]) {
+        if(played[0 + "_" + 2].symbol != square_symbol ||
+           played[1 + "_" + 1].symbol != square_symbol ||
+           played[2 + "_" + 0].symbol != square_symbol) {
+            antidiag_win = false;
+        }
+    } else {
+        antidiag_win = false;
+    }
+
+    return (row_win || col_win || diag_win || antidiag_win);
+}
+
+function game_draw(moves) {
+    if(moves == 9) {
+        return true;
+    }
+    return false;
+}
+
 var rooms = {};
 io.of('/game').on('connection', function(socket) {
     socket.on('load', function(id) {
@@ -48,59 +105,8 @@ io.of('/game').on('connection', function(socket) {
         'color': socket.color
         };
         rooms[socket.room].moves++;
-        var col_win = true;
-        var row_win = true;
-        var diag_win = true;
-        var antidiag_win = true;
-        var square = position.row + "_" + position.col;
-        var square_symbol = played[square].symbol;
-        for(var col = 0; col < 3; col++) {
-            if(played[position.row + "_" + col]) {
-                if(played[position.row + "_" + col].symbol != square_symbol) {
-                    row_win = false;
-                }
-            } else {
-                row_win = false;
-            }
-        }
-
-        for(var row = 0; row < 3; row++) {
-            if(played[row + "_" + position.col]) {
-                if(played[row + "_" + position.col].symbol != square_symbol) {
-                    col_win = false;
-                }
-            } else {
-                col_win = false;
-            }
-        }
-
-        if(played[0 + "_" + 0] && played[1 + "_" + 1] && played[2 + "_" + 2]) {
-            if(played[0 + "_" + 0].symbol != square_symbol ||
-               played[1 + "_" + 1].symbol != square_symbol ||
-               played[2 + "_" + 2].symbol != square_symbol) {
-                diag_win = false;
-            }
-        } else {
-            diag_win = false;
-        }
-
-        if(played[0 + "_" + 2] && played[1 + "_" + 1] && played[2 + "_" + 0]) {
-            if(played[0 + "_" + 2].symbol != square_symbol ||
-               played[1 + "_" + 1].symbol != square_symbol ||
-               played[2 + "_" + 0].symbol != square_symbol) {
-                antidiag_win = false;
-            }
-        } else {
-            antidiag_win = false;
-        }
-
-        var draw = false;
-        if(rooms[socket.room].moves == 9) {
-            draw = true;
-        }
-
-        var over = (row_win || col_win || diag_win || antidiag_win);
-
+        var over = game_over(position, played);
+        var draw = game_draw(rooms[socket.room].moves);
         socket.broadcast.to(socket.room).emit('clicked', {
             'row': position.row,
             'col': position.col,
