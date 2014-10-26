@@ -45,21 +45,19 @@ $(document).ready(function() {
 	});
 
 	socket.on("played", function(position) {
-		$("#" + position.row + "_" + position.col).text(position.symbol)
+        $("#" + position.row + "_" + position.col).text(position.symbol)
 		.css("color", position.color)
 		.prop("disabled", true);
 		$("#game").prop("played", true);
 		if(position.over) {
 			$("#message").text("Congratulations! You win.")
 			.css({
-				"font-size": "30pt",
 				"color": "#45C585"
 			});
 			$("#reset").attr("disabled", false);
 		} else if(position.draw) {
 			$("#message").text("Game ended in a draw.")
 			.css({
-				"font-size": "30pt",
 				"color": "#5E84CF"
 			});
 			$("#reset").attr("disabled", false);
@@ -74,21 +72,34 @@ $(document).ready(function() {
 		if(position.over) {
 			$("#message").text("Sorry! You lose.")
 			.css({
-				"font-size": "30pt",
 				"color": "#FF6262"
 			});
 			$("#reset").attr("disabled", false);
 		} else if(position.draw) {
 			$("#message").text("Game ended in a draw.")
 			.css({
-				"font-size": "30pt",
 				"color": "#5E84CF"
 			});
 			$("#reset").attr("disabled", false);
 		}
 	});
 
-	socket.on("full", function(id) {
-		window.location.href = "/" + id;
-	});
+    socket.on("spectator", function() {
+        $(".square").prop("disabled", true);
+        $("#reset").attr("disabled", true);
+        $("#message").html("You are spectating! Go to <a href = '/'>home</a> to create a new game.")
+        .css("color", "#1A334C");
+    }); 
+
+    socket.on("update", function(played) {
+        var keys = Object.keys(played);
+        console.log(keys); 
+        for(var key in keys) {
+            var square = played[keys[key]];
+            $("#" + square.row + "_" + square.col).text(square.symbol)
+            .css("color", square.color)
+            .prop("disabled", true);
+        }
+    });
+
 });

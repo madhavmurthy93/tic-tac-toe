@@ -18,8 +18,7 @@ function game_over(position, played) {
     var row_win = true;
     var diag_win = true;
     var antidiag_win = true;
-    var square = position.row + "_" + position.col;
-    var square_symbol = played[square].symbol;
+    var square_symbol = played[position.row + "_" + position.col].symbol;
     for(var col = 0; col < 3; col++) {
         if(played[position.row + "_" + col]) {
             if(played[position.row + "_" + col].symbol != square_symbol) {
@@ -75,30 +74,34 @@ io.sockets.on('connection', function(socket) {
     socket.on('load', function(id) {
         if(!rooms[id]) {
             rooms[id] = {
-                'count': 0,
+                'players': 0,
                 'played': {},
-                'moves': 0
+                'moves': 0,
+                'specs': 0
             }
         }
-        rooms[id].count += 1;
         var symbol = '';
         var color = '';
-        if(rooms[id].count < 3) {
-            if(rooms[id].count % 2 == 1) {
+        if(rooms[id].players < 2) {
+            rooms[id].players += 1;
+            if(rooms[id].players % 2 == 1) {
                 symbol = 'o';
                 color = '#5E84CF';
             } else {
                 symbol = 'x';
                 color = '#FF6262';
             }
-            socket.room = id;
+            socket.player = true;
             socket.symbol = symbol;
             socket.color = color;
-            socket.join(id);
         } else {
-            var id = Math.round(Math.random() * 100000);
-            socket.emit('full', id);
+            rooms[id].specs += 1;
+            socket.player = false; 
+            socket.emit('spectator');
         }
+        socket.emit('update', rooms[id].played);
+        socket.room = id;
+        socket.join(id);
     });
 
     socket.on('clicked', function(position) {
@@ -128,19 +131,44 @@ io.sockets.on('connection', function(socket) {
             'over': over,
             'draw': draw
         });
+        var sockets = io.sockets.adapter.rooms[socket.room];
+        for (var socketId in sockets) {
+            var client = io.sockets.connected[socketId];
+            if (!client.player) {
+                socket.to(socketId).emit('spectator');
+            }
+        }
     });
 
     socket.on('reset', function() {
         rooms[socket.room].played = {};
         rooms[socket.room].moves = 0;
         io.sockets.to(socket.room).emit('reset');
+        var sockets = io.sockets.adapter.rooms[socket.room];
+        for (var socketId in sockets) {
+            var client = io.sockets.connected[socketId];
+            if (!client.player) {
+                socket.to(socketId).emit('spectator');
+            }
+        }
     });
 
     socket.on('disconnect', function() {
-        rooms[socket.room].played = {};
-        rooms[socket.room].moves = 0;
-        rooms[socket.room].count -= 1;
-        io.sockets.to(socket.room).emit('reset');
+        if (socket.player) {
+            rooms[socket.room].played = {};
+            rooms[socket.room].moves = 0;
+            rooms[socket.room].players -= 1;
+            io.sockets.to(socket.room).emit('reset');
+        } else {
+            rooms[socket.room].specs -= 1;
+        }
+        var sockets = io.sockets.adapter.rooms[socket.room];
+        for (var socketId in sockets) {
+            var client = io.sockets.connected[socketId];
+            if (!client.player) {
+                socket.to(socketId).emit('spectator');
+            }
+        }
     });
 });
 
