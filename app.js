@@ -13,6 +13,7 @@ var app = express();
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 
+// Check if game is over.
 function game_over(position, played) {
     var col_win = true;
     var row_win = true;
@@ -62,6 +63,7 @@ function game_over(position, played) {
     return (row_win || col_win || diag_win || antidiag_win);
 }
 
+// Check if game is a draw.
 function game_draw(moves) {
     if(moves == 9) {
         return true;
@@ -69,6 +71,7 @@ function game_draw(moves) {
     return false;
 }
 
+// Update the clients spectating the game.
 function update_spectators(socket) {
     var sockets = io.sockets.adapter.rooms[socket.room];
     for (var socketId in sockets) {
