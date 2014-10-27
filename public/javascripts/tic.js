@@ -101,5 +101,9 @@ $(document).ready(function() {
             .prop("disabled", true);
         }
     });
+    
+    socket.on("disable", function() {
+        $("#game").prop("played", true);
+    });
 
 });

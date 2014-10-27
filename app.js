@@ -103,6 +103,9 @@ io.sockets.on('connection', function(socket) {
             } else {
                 symbol = 'x';
                 color = '#FF6262';
+                if (Object.keys(rooms[id].played).length % 2 == 0) {
+                    socket.emit('disable');
+                }
             }
             socket.player = true;
             socket.symbol = symbol;
