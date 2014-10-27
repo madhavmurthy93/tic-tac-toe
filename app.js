@@ -69,6 +69,16 @@ function game_draw(moves) {
     return false;
 }
 
+function update_spectators(socket) {
+    var sockets = io.sockets.adapter.rooms[socket.room];
+    for (var socketId in sockets) {
+        var client = io.sockets.connected[socketId];
+        if (!client.player) {
+            socket.to(socketId).emit('spectator');
+        }
+    }
+}
+
 var rooms = {};
 io.sockets.on('connection', function(socket) {
     socket.on('load', function(id) {
@@ -131,26 +141,14 @@ io.sockets.on('connection', function(socket) {
             'over': over,
             'draw': draw
         });
-        var sockets = io.sockets.adapter.rooms[socket.room];
-        for (var socketId in sockets) {
-            var client = io.sockets.connected[socketId];
-            if (!client.player) {
-                socket.to(socketId).emit('spectator');
-            }
-        }
+        update_spectators(socket);
     });
 
     socket.on('reset', function() {
         rooms[socket.room].played = {};
         rooms[socket.room].moves = 0;
         io.sockets.to(socket.room).emit('reset');
-        var sockets = io.sockets.adapter.rooms[socket.room];
-        for (var socketId in sockets) {
-            var client = io.sockets.connected[socketId];
-            if (!client.player) {
-                socket.to(socketId).emit('spectator');
-            }
-        }
+        update_spectators(socket);
     });
 
     socket.on('disconnect', function() {
@@ -162,13 +160,7 @@ io.sockets.on('connection', function(socket) {
         } else {
             rooms[socket.room].specs -= 1;
         }
-        var sockets = io.sockets.adapter.rooms[socket.room];
-        for (var socketId in sockets) {
-            var client = io.sockets.connected[socketId];
-            if (!client.player) {
-                socket.to(socketId).emit('spectator');
-            }
-        }
+        update_spectators(socket);
     });
 });
 
