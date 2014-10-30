@@ -12,3 +12,6 @@
 .Spotlight-V100
 .Trashes
 
+# node modules
+node_modules
+
