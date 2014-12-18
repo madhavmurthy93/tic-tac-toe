@@ -82,6 +82,19 @@ function update_spectators(socket) {
     }
 }
 
+// Enable user
+function enable_user(socket) {
+    var sockets = io.sockets.adapter.rooms[socket.room];
+    for (var socketId in sockets) {
+        var client = io.sockets.connected[socketId];
+        if (client.player) {
+            client.symbol = 'o';
+            client.color = '#5E84CF';
+            socket.to(socketId).emit('enable');
+        }
+    }
+}
+
 var rooms = {};
 io.sockets.on('connection', function(socket) {
     socket.on('load', function(id) {
@@ -163,6 +176,7 @@ io.sockets.on('connection', function(socket) {
             rooms[socket.room].moves = 0;
             rooms[socket.room].players -= 1;
             io.sockets.to(socket.room).emit('reset');
+            enable_user(socket);
         } else {
             rooms[socket.room].specs -= 1;
         }

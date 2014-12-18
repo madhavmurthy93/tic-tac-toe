@@ -106,4 +106,8 @@ $(document).ready(function() {
         $("#game").prop("played", true);
     });
 
+    socket.on("enable", function() {
+        $("#game").prop("played", false);
+    });
+
 });
